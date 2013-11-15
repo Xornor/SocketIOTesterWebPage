@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC>
+
+<html>
+
+<head>
+
+<title>Socket.io tester</title>
+<meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="https://server.ip.com/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="jumbotron">
+	    	<h1>Socket.io tester</h1>
+	    	<br>
+	    	<div class="input-group input-group-lg">
+	  			<span class="input-group-addon">Id:</span>
+	  			<input id="SocketIOMessageId" type="text" class="form-control" placeholder="Socket.io message id">
+	  		</div>
+	  		<br>
+	  		<div class="input-group input-group-lg">
+	  			<span class="input-group-addon">Message:</span>
+	  			<input id="SocketIOMessage" type="text" class="form-control" placeholder="Socket.io message">
+
+			</div>
+			<br>
+			<div class="btn-group pull-right">
+	  			<button id="SocketIOSendMsgButton" class="btn btn-default btn-lg" type="button" style="width: 200px;">Send</button>
+			</div>
+			<br>
+		</div>
+		<div class="jumbotron">
+			<div id="ResponseWell" class="well">
+			</div>
+		</div>
+ 	</div>
+
+</body>
+<script>
+
+var socket;
+var serverURL = "http://server.ip.com/"
+
+$( document ).ready(function() {
+	$.support.cors                 = true;
+
+	socket = io.connect(serverURL, { secure: true,'force new connection': true, 'connect timeout': 1500,'reconnect': true, 'reconnection delay': 5000});
+
+    socket.on('connect', function() {
+    	console.log("SOCKET.IO: connect");
+    });
+
+    socket.on('reconnect', function() {
+    	console.log("SOCKET.IO: reconnect");
+    });
+
+    socket.on('reconnecting', function() {
+    	console.log("SOCKET.IO: reconnecting");
+    });
+
+    socket.on('connecting', function() {
+    	console.log("SOCKET.IO: connecting");
+    });
+
+    socket.on('connect_error', function() {
+    	console.log("SOCKET.IO: connect_error");
+    });
+
+    socket.on('connect_timeout', function() {
+    	console.log("SOCKET.IO: connect_timeout");
+    });
+
+    socket.on('reconnect_error', function() {
+    	console.log("SOCKET.IO: reconnect_error");
+    });
+
+    socket.on('reconnect_failed', function() {
+		console.log("SOCKET.IO: reconnect_failed");
+    });
+
+    socket.on('error', function() {
+    	console.log("SOCKET.IO: error");
+    });
+
+    socket.on('connect_failed', function() {
+    	console.log("SOCKET.IO: connect_failed");
+    });
+
+    socket.on('disconnect', function() {
+    	console.log("SOCKET.IO: disconnect");
+    });
+
+    //Original func
+	var x = socket.$emit;
+
+	socket.$emit = function(){
+     	var event = arguments[0];
+     	var feed  = arguments[1];
+
+     	//Log
+     	
+		var d=new Date();
+		var h=d.getHours()+"";
+		if (h.length==1) {h="0"+h;};
+		var m=d.getMinutes()+"";
+		if (m.length==1) {m="0"+m;};
+		var s=d.getMilliseconds()+"";
+		if (s.length==1) {s="0"+s;};
+		if (s.length==2) {s="0"+s;};
+
+		var timeString = h+":"+m+":"+s; 
+
+     	var MessageContent = "";
+     	if (feed!=undefined) {
+     		MessageContent = JSON.stringify(feed);
+     	}
+     	$("#ResponseWell").prepend("<p>"+timeString+" > RECEIVED: "+event+" : "+MessageContent+"</p>" );
+
+    	//To pass listener  
+    	x.apply(this, Array.prototype.slice.call(arguments));       
+	};
+
+	$( "#SocketIOSendMsgButton" ).click(function() {
+		var SIOMessageType = $("#SocketIOMessageId").val();
+		var SIOMessageContent = $("#SocketIOMessage").val();
+		try {
+			var SIOMessageObj = JSON.parse(SIOMessageContent);
+		} catch (e) {
+			alert("JSON PARSE ERROR: Message must JSON object in string format.");
+			return;
+		}
+		
+		var d=new Date();
+		var h=d.getHours()+"";
+		if (h.length==1) {h="0"+h;};
+		var m=d.getMinutes()+"";
+		if (m.length==1) {m="0"+m;};
+		var s=d.getMilliseconds()+"";
+		if (s.length==1) {s="0"+s;};
+		if (s.length==2) {s="0"+s;};
+
+		var timeString = h+":"+m+":"+s; 
+		$("#ResponseWell").prepend("<p>"+timeString+" > SEND: "+SIOMessageType+" : "+SIOMessageContent+"</p>" );
+
+		socket.emit(SIOMessageType, SIOMessageObj);
+	});
+});
+</script>
+</html>
+
