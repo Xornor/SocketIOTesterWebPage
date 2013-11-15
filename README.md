@@ -11,5 +11,4 @@ To use the page, change socket.io server URLs to following two lines in the inde
 2. var serverURL = "http://server.ip.com/";
 ```
 
-![alt tag](https://raw.github.com/Xornor/ SocketIOTesterWebPage
-/master/images/page_example.png)
+![alt tag](https://raw.github.com/Xornor/SocketIOTesterWebPage/master/images/page_example.png)
