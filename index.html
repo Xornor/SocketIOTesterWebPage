@@ -9,7 +9,7 @@
 <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://server.ip.com/socket.io/socket.io.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://server.ip.com/socket.io/socket.io.js"></script>
 
 </head>
 
@@ -51,8 +51,13 @@ var serverURL = "http://server.ip.com/";
 $( document ).ready(function() {
 	$.support.cors = true;
 
+	if(typeof io == 'undefined') {
+		alert("SOCKET.IO ERROR: IO undefined - can not load socket.io.js from the server?");
+		return;
+	} 
+	
 	socket = io.connect(serverURL, { secure: true,'force new connection': true, 'connect timeout': 1500,'reconnect': true, 'reconnection delay': 5000});
-
+	
     socket.on('connect', function() {
     	console.log("SOCKET.IO: connect");
     });
@@ -97,25 +102,13 @@ $( document ).ready(function() {
     	console.log("SOCKET.IO: disconnect");
     });
 
-    //Original func
 	var x = socket.$emit;
 
 	socket.$emit = function(){
      	var event = arguments[0];
      	var feed  = arguments[1];
 
-     	//Log
-     	
-		var d=new Date();
-		var h=d.getHours()+"";
-		if (h.length==1) {h="0"+h;};
-		var m=d.getMinutes()+"";
-		if (m.length==1) {m="0"+m;};
-		var s=d.getMilliseconds()+"";
-		if (s.length==1) {s="0"+s;};
-		if (s.length==2) {s="0"+s;};
-
-		var timeString = h+":"+m+":"+s; 
+		var timeString = getTimeString();
 
      	var MessageContent = "";
      	if (feed!=undefined) {
@@ -123,7 +116,6 @@ $( document ).ready(function() {
      	}
      	$("#ResponseWell").prepend("<p>"+timeString+" > RECEIVED: "+event+" : "+MessageContent+"</p>" );
 
-    	//To pass listener  
     	x.apply(this, Array.prototype.slice.call(arguments));       
 	};
 
@@ -137,21 +129,26 @@ $( document ).ready(function() {
 			return;
 		}
 		
-		var d=new Date();
-		var h=d.getHours()+"";
-		if (h.length==1) {h="0"+h;};
-		var m=d.getMinutes()+"";
-		if (m.length==1) {m="0"+m;};
-		var s=d.getMilliseconds()+"";
-		if (s.length==1) {s="0"+s;};
-		if (s.length==2) {s="0"+s;};
-
-		var timeString = h+":"+m+":"+s; 
+		var timeString = getTimeString(); 
 		$("#ResponseWell").prepend("<p>"+timeString+" > SEND: "+SIOMessageType+" : "+SIOMessageContent+"</p>" );
 
 		socket.emit(SIOMessageType, SIOMessageObj);
 	});
 });
+
+function getTimeString() {
+	var d=new Date();
+	var h=d.getHours()+"";
+	if (h.length==1) {h="0"+h;};
+	var m=d.getMinutes()+"";
+	if (m.length==1) {m="0"+m;};
+	var s=d.getMilliseconds()+"";
+	if (s.length==1) {s="0"+s;};
+	if (s.length==2) {s="0"+s;};
+
+	return h+":"+m+":"+s; 
+}
+
 </script>
 </html>
 
