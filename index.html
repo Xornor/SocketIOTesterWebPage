@@ -130,7 +130,7 @@ $( document ).ready(function() {
 		}
 		
 		var timeString = getTimeString(); 
-		$("#ResponseWell").prepend("<p>"+timeString+" > SEND: "+SIOMessageType+" : "+SIOMessageContent+"</p>" );
+		$("#ResponseWell").prepend("<p>"+timeString+" > SENT: "+SIOMessageType+" : "+SIOMessageContent+"</p>" );
 
 		socket.emit(SIOMessageType, SIOMessageObj);
 	});
