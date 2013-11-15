@@ -46,10 +46,10 @@
 <script>
 
 var socket;
-var serverURL = "http://server.ip.com/"
+var serverURL = "http://server.ip.com/";
 
 $( document ).ready(function() {
-	$.support.cors                 = true;
+	$.support.cors = true;
 
 	socket = io.connect(serverURL, { secure: true,'force new connection': true, 'connect timeout': 1500,'reconnect': true, 'reconnection delay': 5000});
 
